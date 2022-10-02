@@ -1,0 +1,66 @@
+---
+title: "Simple R demo"
+author: "Robin Marlow"
+date: "02/10/2022"
+output: pdf_document
+---
+
+```{r include=FALSE, echo=FALSE}
+library("tidyverse")
+library("lubridate")
+library("janitor")
+library("gt")
+
+data<-read_csv("https://raw.githubusercontent.com/robinmarlow/CRIB/main/household2.csv")
+
+data<-
+  data%>%
+  mutate(DoB=dmy(DoB))%>%
+  mutate(Gender=factor(Gender))%>%
+  mutate(Species=factor(Species))%>%
+  mutate(age_days = as.period(interval(DoB, today() ), unit = 'days'))%>%
+  mutate(age_years = as.period(interval(DoB, today() ), unit = 'years'))
+
+mean (as.numeric(data$age) )  
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. 
+
+You can include commands within the text:
+
+Our data file has the columns:
+`r names(data)`
+and `r nrow(data)` rows
+
+
+Or you can embed an R code chunk like this:
+```{r cars}
+head(data)
+```
+
+
+## It can make tables
+```{r echo=FALSE}
+data%>%
+  gt()
+```
+
+## Or plots
+
+```{r echo=FALSE}
+
+data%>%
+  count(Gender)%>%
+  ggplot(aes(x="", y=n, fill=Gender))+
+  geom_bar(width = 1, stat = "identity")+
+  coord_polar("y", start=0)+
+  theme_void() + 
+  scale_fill_brewer(palette="Set1")
+
+```
+
